@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, MessageCircle, Send, LogOut, User, Trash2 } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, Send, LogOut, User, Trash2, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { storiesAPI, commentsAPI } from '../utils/apiClient';
 
@@ -133,49 +133,61 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, userRo
 
   return (
     <div className="min-h-screen bg-stone-50 pb-20">
-      {/* Toolbar */}
-      <div className="bg-white border-b sticky top-0 z-10">
-        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-          <button
-            onClick={onBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-orange-600 font-bold px-3 py-2 rounded-lg hover:bg-orange-50 transition"
-          >
-            <ArrowLeft size={20} /> Quay lại
-          </button>
-          <h2 className="font-bold text-gray-800 truncate px-4 flex-1 text-center">{story.title}</h2>
-          <div className="flex items-center gap-2">
+      {/* Header */}
+      <header className="bg-white shadow-sm pt-6 pb-4 px-4 sticky top-0 z-20">
+        <div className="flex justify-between items-center">
+          {/* Left Side - Logo & Title */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onBack}
+              className="text-gray-600 hover:text-orange-600 font-bold p-2 rounded-lg hover:bg-orange-50 transition"
+              title="Quay lại"
+            >
+              <ArrowLeft size={24} />
+            </button>
+            <div className="flex items-center gap-2">
+              <BookOpen size={28} className="text-orange-500" />
+              <div>
+                <h1 className="text-xl font-bold text-orange-800">Tủ Sách Gia Đình</h1>
+                <p className="text-sm text-gray-600">{story.title}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Side - User Controls */}
+          <div className="flex items-center gap-3">
             {isAuthenticated ? (
               <>
-                <div className="bg-orange-100 text-orange-800 px-3 py-2 rounded-lg font-bold flex items-center gap-2 text-sm">
-                  <User size={16} /> {currentUser}
+                <div className="bg-orange-100 text-orange-800 px-4 py-2 rounded-full font-bold flex items-center gap-2">
+                  <User size={18} /> {currentUser}
                 </div>
                 {userRole === 'admin' && (
                   <button
                     onClick={handleDeleteStory}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50 font-bold px-3 py-2 rounded-lg transition"
-                    title="Xóa truyện này"
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 font-bold p-2 rounded-lg transition"
+                    title="Xóa truyện"
                   >
                     <Trash2 size={20} />
                   </button>
                 )}
                 <button
                   onClick={onLogout}
-                  className="text-gray-600 hover:text-red-600 font-bold px-3 py-2 rounded-lg hover:bg-red-50 transition"
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 transition"
                 >
-                  <LogOut size={20} />
+                  <LogOut size={18} /> Đăng xuất
                 </button>
               </>
             ) : (
               <button
                 onClick={() => navigate('/login')}
-                className="text-blue-600 hover:text-blue-700 font-bold px-3 py-2 rounded-lg hover:bg-blue-50 transition"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 transition"
               >
-                Đăng nhập
+                <User size={18} /> Đăng nhập
               </button>
             )}
           </div>
         </div>
-      </div>
+      </header>
 
       <main className="max-w-4xl mx-auto px-4 mt-6">
         {/* Story Header */}
