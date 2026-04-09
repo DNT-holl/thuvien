@@ -76,7 +76,6 @@ function AppContent() {
       setIsAuthenticated(true);
       setCurrentUser(user.username);
       setUserRole(user.role);
-      setShowLoginModal(false);
       setError('');
       console.log('Login successful!');
       return true;
