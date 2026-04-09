@@ -99,7 +99,10 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, onBack
                   <User size={16} /> {currentUser}
                 </div>
                 <button
-                  onClick={onLogout}
+                  onClick={() => {
+                    onLogout();
+                    onBack();
+                  }}
                   className="text-gray-600 hover:text-red-600 font-bold px-3 py-2 rounded-lg hover:bg-red-50 transition"
                 >
                   <LogOut size={20} />

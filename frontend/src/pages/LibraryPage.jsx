@@ -129,31 +129,31 @@ export default function LibraryPage({
 
       <div className="flex gap-6 px-4 mt-6 max-w-7xl mx-auto">
         {/* Sidebar - Categories */}
-        <aside className="w-48 flex-shrink-0">
-          <div className="bg-white rounded-2xl shadow-md p-4 sticky top-24">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">📚 Danh Mục</h2>
+        <aside className="w-56 flex-shrink-0">
+          <div className="bg-white rounded-xl shadow-sm p-4 sticky top-24 max-h-[calc(100vh-150px)] overflow-y-auto">
+            <h2 className="text-base font-bold text-gray-800 mb-3 px-2">📚 DANH MỤC</h2>
 
             {/* All Button */}
             <button
               onClick={() => onSelectCategory(null)}
-              className={`w-full text-left px-4 py-2 rounded-lg mb-2 font-medium transition ${
+              className={`w-full text-left px-3 py-2 rounded-lg mb-1 font-medium text-sm transition ${
                 selectedCategory === null
                   ? 'bg-orange-500 text-white'
-                  : 'text-gray-700 hover:bg-orange-100'
+                  : 'text-gray-700 hover:bg-orange-50'
               }`}
             >
-              Tất cả
+              📖 Tất cả
             </button>
 
             {/* Categories List */}
             {categories.map((cat) => (
-              <div key={cat._id} className="flex items-center gap-2 mb-2">
+              <div key={cat._id} className="flex items-center gap-1 mb-1 group">
                 <button
                   onClick={() => onSelectCategory(cat._id)}
-                  className={`flex-1 text-left px-4 py-2 rounded-lg font-medium transition ${
+                  className={`flex-1 text-left px-3 py-2 rounded-lg font-medium text-sm transition ${
                     selectedCategory === cat._id
                       ? 'bg-orange-500 text-white'
-                      : 'text-gray-700 hover:bg-orange-100'
+                      : 'text-gray-700 hover:bg-orange-50'
                   }`}
                 >
                   {cat.icon} {cat.name}
@@ -161,7 +161,7 @@ export default function LibraryPage({
                 {isAuthenticated && userRole === 'admin' && (
                   <button
                     onClick={() => handleDeleteCategory(cat._id)}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition"
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded text-xs opacity-0 group-hover:opacity-100 transition"
                   >
                     ✕
                   </button>
@@ -172,30 +172,42 @@ export default function LibraryPage({
             {/* Add Category Button (Admin only) */}
             {isAuthenticated && userRole === 'admin' && (
               <>
-                <button
-                  onClick={() => setShowNewCategory(!showNewCategory)}
-                  className="w-full bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-bold flex items-center justify-center gap-2 transition mt-4"
-                >
-                  <Plus size={16} /> Danh mục mới
-                </button>
-
-                {showNewCategory && (
-                  <div className="mt-4 pt-4 border-t">
+                {!showNewCategory ? (
+                  <button
+                    onClick={() => setShowNewCategory(true)}
+                    className="w-full bg-purple-500 hover:bg-purple-600 text-white px-3 py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-1 transition mt-3"
+                  >
+                    <Plus size={14} /> Thêm mục
+                  </button>
+                ) : (
+                  <div className="mt-3 pt-3 border-t">
                     <input
                       type="text"
                       placeholder="Tên danh mục..."
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
-                      className="w-full px-2 py-1 border rounded text-sm mb-2"
+                      className="w-full px-2 py-1 border rounded text-xs mb-2 focus:outline-none focus:border-purple-500"
                       disabled={creatingCategory}
+                      autoFocus
                     />
-                    <button
-                      onClick={handleCreateCategory}
-                      disabled={creatingCategory}
-                      className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-2 py-1 rounded text-sm font-bold transition"
-                    >
-                      {creatingCategory ? 'Đang tạo...' : 'Tạo'}
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleCreateCategory}
+                        disabled={creatingCategory || !newCategoryName.trim()}
+                        className="flex-1 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-2 py-1 rounded text-xs font-bold transition"
+                      >
+                        Tạo
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowNewCategory(false);
+                          setNewCategoryName('');
+                        }}
+                        className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded text-xs font-bold transition"
+                      >
+                        Hủy
+                      </button>
+                    </div>
                   </div>
                 )}
               </>
