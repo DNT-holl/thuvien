@@ -66,6 +66,7 @@ function AppContent() {
     setLoading(true);
     setError('');
     try {
+      console.log('Logging in with:', { username, VITE_API_URL: import.meta.env.VITE_API_URL });
       const response = await authAPI.login(username, password);
       const { token, user } = response.data;
 
@@ -78,9 +79,12 @@ function AppContent() {
       setUserRole(user.role);
       setShowLoginModal(false);
       setError('');
+      console.log('Login successful!');
       return true;
     } catch (err) {
-      setError(err.response?.data?.message || 'Lỗi đăng nhập!');
+      const errorMsg = err.response?.data?.message || err.message || 'Lỗi đăng nhập!';
+      console.error('Login error:', errorMsg);
+      setError(errorMsg);
       return false;
     } finally {
       setLoading(false);

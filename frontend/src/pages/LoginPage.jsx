@@ -17,6 +17,7 @@ export default function LoginPage({ onLogin, error, loading }) {
       return;
     }
     setLocalError('');
+    console.log('Login attempt:', { username: currentUser, password: passwordInput });
     onLogin(currentUser, passwordInput);
   };
 
@@ -61,7 +62,9 @@ export default function LoginPage({ onLogin, error, loading }) {
           </div>
 
           {(error || localError) && (
-            <p className="text-red-500 font-medium text-center">{error || localError}</p>
+            <div className="bg-red-100 border-2 border-red-500 text-red-700 p-4 rounded-lg font-medium text-center">
+              {error || localError}
+            </div>
           )}
 
           <button
