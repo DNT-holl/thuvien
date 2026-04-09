@@ -1,23 +1,25 @@
 import './index.css';
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import { authAPI, storiesAPI, commentsAPI, categoriesAPI } from './utils/apiClient';
-import LoginPage from './pages/LoginPage';
 import LibraryPage from './pages/LibraryPage';
 import ReaderPage from './pages/ReaderPage';
 import AdminPanel from './pages/AdminPanel';
 
-export default function App() {
+// Context để chia sẻ auth state
+export const AuthContext = React.createContext();
+
+function AppContent() {
+  const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState('');
   const [userRole, setUserRole] = useState('viewer');
-  const [currentScreen, setCurrentScreen] = useState('library');
   const [showLoginModal, setShowLoginModal] = useState(false);
   
   const [stories, setStories] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedStory, setSelectedStory] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -103,100 +105,135 @@ export default function App() {
     setCurrentUser('');
     setUserRole('viewer');
     setShowLoginModal(false);
-    setSelectedStory(null);
-  };
-
-  // Mở truyện để đọc
-  const openStory = async (storyId) => {
-    try {
-      const response = await storiesAPI.getById(storyId);
-      setSelectedStory(response.data);
-      setCurrentScreen('reader');
-    } catch (err) {
-      setError('Không thể tải truyện!');
-    }
-  };
-
-  // Quay lại tủ sách
-  const goBack = () => {
-    setSelectedStory(null);
-    setCurrentScreen('library');
-  };
-
-  const goToAdmin = () => {
-    setCurrentScreen('admin');
+    navigate('/');
   };
 
   // Thêm truyện (Admin only)
   const handleAddStory = async (storyData) => {
     try {
       await storiesAPI.create(storyData);
-      await loadStories();
-      setCurrentScreen('library');
+      await loadStories(selectedCategory, searchQuery);
+      navigate('/');
       setError('');
     } catch (err) {
       setError('Lỗi thêm truyện!');
     }
   };
 
-  // Render screens
-  if (currentScreen === 'admin' && userRole === 'admin') {
-    return (
-      <AdminPanel
-        onBack={() => setCurrentScreen('library')}
-        onAddStory={handleAddStory}
-        currentUser={currentUser}
-        onLogout={handleLogout}
-      />
-    );
-  }
+  const handleSelectCategory = (catId) => {
+    setSelectedCategory(catId);
+    loadStories(catId, searchQuery);
+  };
 
-  if (currentScreen === 'reader' && selectedStory) {
-    return (
-      <ReaderPage
-        story={selectedStory}
-        currentUser={currentUser}
-        isAuthenticated={isAuthenticated}
-        onBack={goBack}
-        onLogout={handleLogout}
-        onOpenLogin={() => setShowLoginModal(true)}
-      />
-    );
-  }
+  const handleSearchChange = (query) => {
+    setSearchQuery(query);
+    loadStories(selectedCategory, query);
+  };
 
-  if (currentScreen === 'library') {
-    return (
-      <LibraryPage
-        stories={stories}
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onSelectCategory={(catId) => {
-          setSelectedCategory(catId);
-          loadStories(catId, searchQuery);
-        }}
-        searchQuery={searchQuery}
-        onSearchChange={(query) => {
-          setSearchQuery(query);
-          loadStories(selectedCategory, query);
-        }}
-        currentUser={currentUser}
-        isAuthenticated={isAuthenticated}
-        userRole={userRole}
-        loading={loading}
-        error={error}
-        onSelectStory={openStory}
-        onLogout={handleLogout}
-        onOpenAdmin={goToAdmin}
-        onOpenLogin={() => setShowLoginModal(true)}
-        showLoginModal={showLoginModal}
-        onLogin={handleLogin}
-        loginError={error}
-        loginLoading={loading}
-        onCloseLogin={() => setShowLoginModal(false)}
-        onRefreshCategories={loadCategories}
-      />
-    );
-  }
+  return (
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        currentUser,
+        userRole,
+        showLoginModal,
+        setShowLoginModal,
+      }}
+    >
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <LibraryPage
+              stories={stories}
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onSelectCategory={handleSelectCategory}
+              searchQuery={searchQuery}
+              onSearchChange={handleSearchChange}
+              currentUser={currentUser}
+              isAuthenticated={isAuthenticated}
+              userRole={userRole}
+              loading={loading}
+              error={error}
+              onSelectStory={(storyId) => navigate(`/story/${storyId}`)}
+              onLogout={handleLogout}
+              onOpenAdmin={() => navigate('/admin')}
+              onOpenLogin={() => setShowLoginModal(true)}
+              showLoginModal={showLoginModal}
+              onLogin={handleLogin}
+              loginError={error}
+              loginLoading={loading}
+              onCloseLogin={() => setShowLoginModal(false)}
+              onRefreshCategories={loadCategories}
+            />
+          }
+        />
 
-  return null;
+        <Route
+          path="/story/:id"
+          element={
+            <ReaderPageRoute
+              stories={stories}
+              isAuthenticated={isAuthenticated}
+              currentUser={currentUser}
+              onLogout={handleLogout}
+              onOpenLogin={() => setShowLoginModal(true)}
+            />
+          }
+        />
+
+        <Route
+          path="/admin"
+          element={
+            userRole === 'admin' ? (
+              <AdminPanel
+                onBack={() => navigate('/')}
+                onAddStory={handleAddStory}
+                currentUser={currentUser}
+                onLogout={handleLogout}
+              />
+            ) : (
+              <div className="flex items-center justify-center min-h-screen">
+                <p className="text-2xl font-bold text-red-600">Không có quyền truy cập!</p>
+              </div>
+            )
+          }
+        />
+      </Routes>
+    </AuthContext.Provider>
+  );
 }
+
+// Component để lấy story từ URL param
+function ReaderPageRoute({ stories, isAuthenticated, currentUser, onLogout, onOpenLogin }) {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const story = stories.find((s) => s._id === id);
+
+  if (!story) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-2xl font-bold text-gray-600">Truyện không tìm thấy!</p>
+      </div>
+    );
+  }
+
+  return (
+    <ReaderPage
+      story={story}
+      currentUser={currentUser}
+      isAuthenticated={isAuthenticated}
+      onBack={() => navigate(-1)}
+      onLogout={onLogout}
+      onOpenLogin={onOpenLogin}
+    />
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
