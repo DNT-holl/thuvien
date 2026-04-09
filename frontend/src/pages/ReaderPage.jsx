@@ -132,7 +132,7 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, userRo
               </>
             ) : (
               <button
-                onClick={onOpenLogin}
+                onClick={() => navigate('/login')}
                 className="text-blue-600 hover:text-blue-700 font-bold px-3 py-2 rounded-lg hover:bg-blue-50 transition"
               >
                 Đăng nhập

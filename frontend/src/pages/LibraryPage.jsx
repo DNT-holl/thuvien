@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
 import { BookOpen, User, LogOut, X, Plus, Search } from 'lucide-react';
-import { categoriesAPI } from '../utils/apiClient';
 
 export default function LibraryPage({
   stories,
-  categories,
-  selectedCategory,
-  onSelectCategory,
   searchQuery,
   onSearchChange,
   currentUser,
@@ -23,52 +19,15 @@ export default function LibraryPage({
   loginError,
   loginLoading,
   onCloseLogin,
-  onRefreshCategories,
 }) {
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [showNewCategory, setShowNewCategory] = useState(false);
-  const [creatingCategory, setCreatingCategory] = useState(false);
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     await onLogin(loginUsername, loginPassword);
     setLoginUsername('');
     setLoginPassword('');
-  };
-
-  const handleCreateCategory = async () => {
-    if (!newCategoryName.trim()) return;
-    
-    setCreatingCategory(true);
-    try {
-      await categoriesAPI.create({
-        name: newCategoryName,
-        icon: '📚',
-      });
-      setNewCategoryName('');
-      setShowNewCategory(false);
-      await onRefreshCategories();
-    } catch (err) {
-      console.error('Lỗi tạo danh mục:', err);
-    } finally {
-      setCreatingCategory(false);
-    }
-  };
-
-  const handleDeleteCategory = async (catId) => {
-    if (window.confirm('Bạn chắc muốn xóa danh mục này?')) {
-      try {
-        await categoriesAPI.delete(catId);
-        await onRefreshCategories();
-        if (selectedCategory === catId) {
-          onSelectCategory(null);
-        }
-      } catch (err) {
-        console.error('Lỗi xóa danh mục:', err);
-      }
-    }
   };
 
   return (
@@ -127,96 +86,9 @@ export default function LibraryPage({
         </div>
       </header>
 
-      <div className="flex gap-4 px-4 mt-4 max-w-7xl mx-auto">
-        {/* Sidebar - Categories */}
-        <aside className="w-52 flex-shrink-0">
-          <div className="bg-white rounded-xl shadow-sm p-3 sticky top-20 max-h-[calc(100vh-120px)] overflow-y-auto">
-            <h2 className="text-sm font-bold text-gray-800 mb-2 px-2">📚 DANH MỤC</h2>
-
-            {/* All Button */}
-            <button
-              onClick={() => onSelectCategory(null)}
-              className={`w-full text-left px-3 py-1.5 rounded-lg mb-0.5 font-medium text-xs transition ${
-                selectedCategory === null
-                  ? 'bg-orange-500 text-white'
-                  : 'text-gray-700 hover:bg-orange-50'
-              }`}
-            >
-              📖 Tất cả
-            </button>
-
-            {/* Categories List */}
-            {categories.map((cat) => (
-              <div key={cat._id} className="flex items-center gap-0.5 mb-0.5 group">
-                <button
-                  onClick={() => onSelectCategory(cat._id)}
-                  className={`flex-1 text-left px-3 py-1.5 rounded-lg font-medium text-xs transition ${
-                    selectedCategory === cat._id
-                      ? 'bg-orange-500 text-white'
-                      : 'text-gray-700 hover:bg-orange-50'
-                  }`}
-                >
-                  {cat.icon} {cat.name}
-                </button>
-                {isAuthenticated && userRole === 'admin' && (
-                  <button
-                    onClick={() => handleDeleteCategory(cat._id)}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50 p-0.5 rounded text-xs opacity-0 group-hover:opacity-100 transition"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-            ))}
-
-            {/* Add Category Button (Admin only) */}
-            {isAuthenticated && userRole === 'admin' && (
-              <>
-                {!showNewCategory ? (
-                  <button
-                    onClick={() => setShowNewCategory(true)}
-                    className="w-full bg-purple-500 hover:bg-purple-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition mt-2"
-                  >
-                    <Plus size={12} /> Mục mới
-                  </button>
-                ) : (
-                  <div className="mt-2 pt-2 border-t">
-                    <input
-                      type="text"
-                      placeholder="Tên danh mục..."
-                      value={newCategoryName}
-                      onChange={(e) => setNewCategoryName(e.target.value)}
-                      className="w-full px-2 py-1 border rounded text-xs mb-1 focus:outline-none focus:border-purple-500"
-                      disabled={creatingCategory}
-                      autoFocus
-                    />
-                    <div className="flex gap-1">
-                      <button
-                        onClick={handleCreateCategory}
-                        disabled={creatingCategory || !newCategoryName.trim()}
-                        className="flex-1 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-2 py-1 rounded text-xs font-bold transition"
-                      >
-                        Tạo
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowNewCategory(false);
-                          setNewCategoryName('');
-                        }}
-                        className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-2 py-1 rounded text-xs font-bold transition"
-                      >
-                        Hủy
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        </aside>
-
+      <div className="px-4 mt-4 max-w-7xl mx-auto">
         {/* Main Content */}
-        <main className="flex-1">
+        <main>
           {error && (
             <div className="bg-red-100 border-2 border-red-500 text-red-700 p-4 rounded-lg mb-6">
               {error}

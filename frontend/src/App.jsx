@@ -1,7 +1,7 @@
 import './index.css';
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useParams } from 'react-router-dom';
-import { authAPI, storiesAPI, commentsAPI, categoriesAPI } from './utils/apiClient';
+import { authAPI, storiesAPI, commentsAPI } from './utils/apiClient';
 import LoginPage from './pages/LoginPage';
 import LibraryPage from './pages/LibraryPage';
 import ReaderPage from './pages/ReaderPage';
@@ -18,8 +18,6 @@ function AppContent() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   
   const [stories, setStories] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -45,26 +43,15 @@ function AppContent() {
         });
     }
     
-    // Luôn load stories và categories (public)
-    loadCategories();
+    // Luôn load stories (public)
     loadStories();
   }, []);
 
-  // Load categories
-  const loadCategories = async () => {
-    try {
-      const response = await categoriesAPI.getAll();
-      setCategories(response.data);
-    } catch (err) {
-      console.error('Lỗi tải danh mục:', err);
-    }
-  };
-
   // Tải danh sách truyện
-  const loadStories = async (categoryId = null, search = '') => {
+  const loadStories = async (search = '') => {
     setLoading(true);
     try {
-      const response = await storiesAPI.getAll(categoryId, search);
+      const response = await storiesAPI.getAll(null, search);
       setStories(response.data);
       setError('');
     } catch (err) {
@@ -113,7 +100,7 @@ function AppContent() {
   const handleAddStory = async (storyData) => {
     try {
       await storiesAPI.create(storyData);
-      await loadStories(selectedCategory, searchQuery);
+      await loadStories();
       navigate('/');
       setError('');
     } catch (err) {
@@ -121,14 +108,9 @@ function AppContent() {
     }
   };
 
-  const handleSelectCategory = (catId) => {
-    setSelectedCategory(catId);
-    loadStories(catId, searchQuery);
-  };
-
   const handleSearchChange = (query) => {
     setSearchQuery(query);
-    loadStories(selectedCategory, query);
+    loadStories(null, query);
   };
 
   return (
@@ -161,9 +143,6 @@ function AppContent() {
           element={
             <LibraryPage
               stories={stories}
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onSelectCategory={handleSelectCategory}
               searchQuery={searchQuery}
               onSearchChange={handleSearchChange}
               currentUser={currentUser}
@@ -180,7 +159,6 @@ function AppContent() {
               loginError={error}
               loginLoading={loading}
               onCloseLogin={() => setShowLoginModal(false)}
-              onRefreshCategories={loadCategories}
             />
           }
         />
