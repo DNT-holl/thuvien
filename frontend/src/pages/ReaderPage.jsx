@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, ThumbsUp, Smile, MessageCircle, Send, LogOut, PlayCircle } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, Send, LogOut, User, PlayCircle } from 'lucide-react';
 import { storiesAPI, commentsAPI } from '../utils/apiClient';
 
-export default function ReaderPage({ story, currentUser, onBack, onLogout }) {
+export default function ReaderPage({ story, currentUser, isAuthenticated, onBack, onLogout, onOpenLogin }) {
   const [comments, setComments] = useState([]);
   const [commentInput, setCommentInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,6 +22,11 @@ export default function ReaderPage({ story, currentUser, onBack, onLogout }) {
   };
 
   const handleReact = async (type) => {
+    if (!isAuthenticated) {
+      onOpenLogin();
+      return;
+    }
+
     try {
       // Nếu user chưa tim, thì tim
       if (!hasLiked) {
@@ -43,6 +48,12 @@ export default function ReaderPage({ story, currentUser, onBack, onLogout }) {
 
   const handleAddComment = async (e) => {
     e.preventDefault();
+    
+    if (!isAuthenticated) {
+      onOpenLogin();
+      return;
+    }
+
     if (!commentInput.trim()) return;
 
     setLoading(true);
@@ -81,12 +92,28 @@ export default function ReaderPage({ story, currentUser, onBack, onLogout }) {
             <ArrowLeft size={20} /> Quay lại
           </button>
           <h2 className="font-bold text-gray-800 truncate px-4 flex-1 text-center">{story.title}</h2>
-          <button
-            onClick={onLogout}
-            className="text-gray-600 hover:text-red-600 font-bold px-3 py-2 rounded-lg hover:bg-red-50 transition"
-          >
-            <LogOut size={20} />
-          </button>
+          <div className="flex items-center gap-2">
+            {isAuthenticated ? (
+              <>
+                <div className="bg-orange-100 text-orange-800 px-3 py-2 rounded-lg font-bold flex items-center gap-2 text-sm">
+                  <User size={16} /> {currentUser}
+                </div>
+                <button
+                  onClick={onLogout}
+                  className="text-gray-600 hover:text-red-600 font-bold px-3 py-2 rounded-lg hover:bg-red-50 transition"
+                >
+                  <LogOut size={20} />
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={onOpenLogin}
+                className="text-blue-600 hover:text-blue-700 font-bold px-3 py-2 rounded-lg hover:bg-blue-50 transition"
+              >
+                Đăng nhập
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

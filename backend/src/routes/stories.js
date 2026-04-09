@@ -4,8 +4,8 @@ import { authenticateToken, isAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// GET /api/stories - Lấy danh sách tất cả truyện
-router.get('/', authenticateToken, async (req, res) => {
+// GET /api/stories - Lấy danh sách tất cả truyện (Public)
+router.get('/', async (req, res) => {
   try {
     const stories = await Story.find({ isPublished: true })
       .select('id title author cover reactions comments createdAt');
@@ -15,8 +15,8 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// GET /api/stories/:id - Lấy chi tiết một truyện
-router.get('/:id', authenticateToken, async (req, res) => {
+// GET /api/stories/:id - Lấy chi tiết một truyện (Public)
+router.get('/:id', async (req, res) => {
   try {
     const story = await Story.findById(req.params.id);
     if (!story) {

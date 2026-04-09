@@ -10,7 +10,8 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState('');
   const [userRole, setUserRole] = useState('viewer');
-  const [currentScreen, setCurrentScreen] = useState('login');
+  const [currentScreen, setCurrentScreen] = useState('library');
+  const [showLoginModal, setShowLoginModal] = useState(false);
   
   const [stories, setStories] = useState([]);
   const [selectedStory, setSelectedStory] = useState(null);
@@ -30,8 +31,6 @@ export default function App() {
           setIsAuthenticated(true);
           setCurrentUser(savedUser);
           setUserRole(savedRole || 'viewer');
-          setCurrentScreen('library');
-          loadStories();
         })
         .catch(() => {
           localStorage.removeItem('token');
@@ -39,6 +38,9 @@ export default function App() {
           setIsAuthenticated(false);
         });
     }
+    
+    // Luôn load stories (public)
+    loadStories();
   }, []);
 
   // Tải danh sách truyện
@@ -69,10 +71,8 @@ export default function App() {
       setIsAuthenticated(true);
       setCurrentUser(user.username);
       setUserRole(user.role);
-      setCurrentScreen('library');
+      setShowLoginModal(false);
       setError('');
-
-      await loadStories();
     } catch (err) {
       setError(err.response?.data?.message || 'Lỗi đăng nhập!');
     } finally {
@@ -88,8 +88,7 @@ export default function App() {
     setIsAuthenticated(false);
     setCurrentUser('');
     setUserRole('viewer');
-    setCurrentScreen('login');
-    setStories([]);
+    setShowLoginModal(false);
     setSelectedStory(null);
   };
 
@@ -127,10 +126,6 @@ export default function App() {
   };
 
   // Render screens
-  if (currentScreen === 'login') {
-    return <LoginPage onLogin={handleLogin} error={error} loading={loading} />;
-  }
-
   if (currentScreen === 'admin' && userRole === 'admin') {
     return (
       <AdminPanel
@@ -147,8 +142,10 @@ export default function App() {
       <ReaderPage
         story={selectedStory}
         currentUser={currentUser}
+        isAuthenticated={isAuthenticated}
         onBack={goBack}
         onLogout={handleLogout}
+        onOpenLogin={() => setShowLoginModal(true)}
       />
     );
   }
@@ -158,12 +155,19 @@ export default function App() {
       <LibraryPage
         stories={stories}
         currentUser={currentUser}
+        isAuthenticated={isAuthenticated}
         userRole={userRole}
         loading={loading}
         error={error}
         onSelectStory={openStory}
         onLogout={handleLogout}
         onOpenAdmin={goToAdmin}
+        onOpenLogin={() => setShowLoginModal(true)}
+        showLoginModal={showLoginModal}
+        onLogin={handleLogin}
+        loginError={error}
+        loginLoading={loading}
+        onCloseLogin={() => setShowLoginModal(false)}
       />
     );
   }

@@ -1,27 +1,44 @@
-import React from 'react';
-import { BookOpen, User, LogOut, Lock } from 'lucide-react';
+import React, { useState } from 'react';
+import { BookOpen, User, LogOut, Lock, X } from 'lucide-react';
 
 export default function LibraryPage({
   stories,
   currentUser,
+  isAuthenticated,
   userRole,
   loading,
   error,
   onSelectStory,
   onLogout,
   onOpenAdmin,
+  onOpenLogin,
+  showLoginModal,
+  onLogin,
+  loginError,
+  loginLoading,
+  onCloseLogin,
 }) {
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    await onLogin(loginUsername, loginPassword);
+    setLoginUsername('');
+    setLoginPassword('');
+  };
+
   return (
     <div className="min-h-screen bg-orange-50 pb-12">
       {/* Header */}
-      <header className="bg-white shadow-sm pt-6 pb-4 px-4 sticky top-0 z-10">
+      <header className="bg-white shadow-sm pt-6 pb-4 px-4 sticky top-0 z-20">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
             <BookOpen size={32} className="text-orange-500" />
             <h1 className="text-2xl font-bold text-orange-800">Tủ Sách Gia Đình</h1>
           </div>
           <div className="flex items-center gap-3">
-            {userRole === 'admin' && (
+            {isAuthenticated && userRole === 'admin' && (
               <button
                 onClick={onOpenAdmin}
                 className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 transition"
@@ -29,15 +46,26 @@ export default function LibraryPage({
                 <Lock size={18} /> Admin
               </button>
             )}
-            <div className="bg-orange-100 text-orange-800 px-4 py-2 rounded-full font-bold flex items-center gap-2">
-              <User size={18} /> {currentUser}
-            </div>
-            <button
-              onClick={onLogout}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 transition"
-            >
-              <LogOut size={18} />
-            </button>
+            {isAuthenticated ? (
+              <>
+                <div className="bg-orange-100 text-orange-800 px-4 py-2 rounded-full font-bold flex items-center gap-2">
+                  <User size={18} /> {currentUser}
+                </div>
+                <button
+                  onClick={onLogout}
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 transition"
+                >
+                  <LogOut size={18} /> Đăng xuất
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={onOpenLogin}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 transition"
+              >
+                <User size={18} /> Đăng nhập
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -89,6 +117,60 @@ export default function LibraryPage({
           </div>
         )}
       </main>
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-orange-800">Đăng Nhập Admin</h2>
+              <button onClick={onCloseLogin} className="text-gray-500 hover:text-gray-700">
+                <X size={24} />
+              </button>
+            </div>
+
+            {loginError && (
+              <div className="bg-red-100 border-2 border-red-500 text-red-700 p-3 rounded-lg mb-4">
+                {loginError}
+              </div>
+            )}
+
+            <form onSubmit={handleLoginSubmit}>
+              <div className="mb-4">
+                <label className="block text-gray-700 font-bold mb-2">Username</label>
+                <input
+                  type="text"
+                  value={loginUsername}
+                  onChange={(e) => setLoginUsername(e.target.value)}
+                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none"
+                  placeholder="Tên người dùng"
+                  disabled={loginLoading}
+                />
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-gray-700 font-bold mb-2">Password</label>
+                <input
+                  type="password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none"
+                  placeholder="Mật khẩu gia đình"
+                  disabled={loginLoading}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loginLoading}
+                className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 text-white font-bold py-2 rounded-lg transition"
+              >
+                {loginLoading ? 'Đang đăng nhập...' : 'Đăng Nhập'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
