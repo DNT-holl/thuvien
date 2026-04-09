@@ -167,14 +167,20 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
             <div>
               <label className="block font-bold text-gray-700 mb-2">URL File PDF *</label>
               <input
-                type="url"
+                type="text"
                 name="pdfLink"
                 value={formData.pdfLink}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"
-                placeholder="Nhập URL file PDF từ Google Drive..."
+                placeholder="Paste link PDF từ Google Drive (tự động chuyển đổi)"
               />
+              <p className="text-xs text-gray-500 mt-2">
+                💡 Hỗ trợ các định dạng:
+                <br />• https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+                <br />• https://drive.google.com/uc?id=FILE_ID
+                <br />• FILE_ID (chỉ ID)
+              </p>
             </div>
 
             <div>

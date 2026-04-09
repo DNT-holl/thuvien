@@ -10,6 +10,42 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, userRo
   const [loading, setLoading] = useState(false);
   const [hasLiked, setHasLiked] = useState(false);
 
+  // Chuyển đổi URL Google Drive sang dạng embed
+  const convertGoogleDriveUrl = (url) => {
+    if (!url) return null;
+    
+    // Nếu đã là dạng /uc?id=... thì trả về luôn
+    if (url.includes('/uc?id=')) {
+      return url;
+    }
+    
+    // Extract FILE_ID từ các định dạng khác
+    let fileId = null;
+    
+    // Format: https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+    const match1 = url.match(/\/file\/d\/([a-zA-Z0-9-_]+)/);
+    if (match1) {
+      fileId = match1[1];
+    }
+    
+    // Format: https://drive.google.com/open?id=FILE_ID
+    const match2 = url.match(/id=([a-zA-Z0-9-_]+)/);
+    if (!fileId && match2) {
+      fileId = match2[1];
+    }
+    
+    // Format: Nếu chỉ paste FILE_ID trực tiếp
+    if (!fileId && url.match(/^[a-zA-Z0-9-_]{25,}$/)) {
+      fileId = url;
+    }
+    
+    if (fileId) {
+      return `https://drive.google.com/uc?id=${fileId}`;
+    }
+    
+    return url;
+  };
+
   useEffect(() => {
     loadComments();
   }, [story._id]);
@@ -163,7 +199,7 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, userRo
           <div className="bg-white rounded-3xl shadow-sm p-6 mb-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">📖 Đọc truyện</h2>
             <iframe
-              src={`${story.pdfLink}#toolbar=1&navpanes=0`}
+              src={`${convertGoogleDriveUrl(story.pdfLink)}#toolbar=1&navpanes=0`}
               className="w-full h-screen rounded-2xl border-2 border-gray-200"
               title="PDF Viewer"
               frameBorder="0"
