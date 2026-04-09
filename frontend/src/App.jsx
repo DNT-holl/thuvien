@@ -64,6 +64,7 @@ function AppContent() {
   // Đăng nhập
   const handleLogin = async (username, password) => {
     setLoading(true);
+    setError('');
     try {
       const response = await authAPI.login(username, password);
       const { token, user } = response.data;
@@ -77,8 +78,10 @@ function AppContent() {
       setUserRole(user.role);
       setShowLoginModal(false);
       setError('');
+      return true;
     } catch (err) {
       setError(err.response?.data?.message || 'Lỗi đăng nhập!');
+      return false;
     } finally {
       setLoading(false);
     }
@@ -129,8 +132,10 @@ function AppContent() {
           element={
             <LoginPage
               onLogin={async (username, password) => {
-                await handleLogin(username, password);
-                navigate('/');
+                const success = await handleLogin(username, password);
+                if (success) {
+                  navigate('/');
+                }
               }}
               error={error}
               loading={loading}

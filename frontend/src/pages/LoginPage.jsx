@@ -40,8 +40,8 @@ export default function LoginPage({ onLogin, error, loading }) {
                 type="text"
                 value={currentUser}
                 onChange={(e) => setCurrentUser(e.target.value)}
-                placeholder="Ví dụ: Bé Na, Bin..."
-                className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-orange-100 focus:border-orange-400 focus:outline-none transition"
+                placeholder="Ví dụ: Bé Na, Bé Bin..."
+                className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-orange-100 focus:border-orange-400 focus:outline-none transition placeholder-gray-400"
               />
             </div>
           </div>
@@ -55,7 +55,7 @@ export default function LoginPage({ onLogin, error, loading }) {
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
                 placeholder="(Hỏi bố/cậu nhé)"
-                className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-orange-100 focus:border-orange-400 focus:outline-none transition"
+                className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-orange-100 focus:border-orange-400 focus:outline-none transition placeholder-gray-400"
               />
             </div>
           </div>
