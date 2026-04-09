@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, MessageCircle, Send, LogOut, User, PlayCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, Send, LogOut, User, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { storiesAPI, commentsAPI } from '../utils/apiClient';
 
@@ -89,7 +89,10 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, userRo
 
     try {
       await storiesAPI.delete(story._id);
-      onDelete();
+      // Chờ 1 giây rồi navigate về trang chủ để tránh lỗi
+      setTimeout(() => {
+        onDelete();
+      }, 500);
     } catch (error) {
       console.error('Lỗi xóa truyện:', error);
       alert('Lỗi xóa truyện!');
@@ -142,36 +145,35 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, userRo
         </div>
       </div>
 
-      <main className="max-w-3xl mx-auto px-4 mt-6">
-        {/* Story Content */}
+      <main className="max-w-4xl mx-auto px-4 mt-6">
+        {/* Story Header */}
         <div className="bg-white rounded-3xl shadow-sm p-6 md:p-10 mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2 text-center">{story.title}</h1>
-          <p className="text-center text-gray-500 font-medium mb-8">Sưu tầm: {story.author}</p>
+          <p className="text-center text-gray-500 font-medium mb-8">Tác giả: {story.author}</p>
 
           <img
             src={story.cover}
             alt="Bìa truyện"
-            className="w-full h-64 md:h-96 object-cover rounded-2xl mb-8 border-4 border-stone-100"
+            className="w-full h-64 md:h-96 object-cover rounded-2xl border-4 border-stone-100"
           />
-
-          {/* Audio Player */}
-          {story.audioLink && (
-            <div className="bg-orange-50 rounded-2xl p-4 mb-8 border-2 border-orange-100 flex flex-col items-center">
-              <p className="text-orange-800 font-bold mb-3 flex items-center gap-2">
-                <PlayCircle size={20} /> Nghe truyện đọc
-              </p>
-              <audio controls className="w-full max-w-md">
-                <source src={story.audioLink} type="audio/mpeg" />
-                Trình duyệt không hỗ trợ nghe nhạc.
-              </audio>
-            </div>
-          )}
-
-          {/* Story Content */}
-          <div className="prose prose-lg prose-stone max-w-none text-xl leading-relaxed text-gray-700 whitespace-pre-wrap">
-            {story.content}
-          </div>
         </div>
+
+        {/* PDF Viewer */}
+        {story.pdfLink ? (
+          <div className="bg-white rounded-3xl shadow-sm p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">📖 Đọc truyện</h2>
+            <iframe
+              src={`${story.pdfLink}#toolbar=1&navpanes=0`}
+              className="w-full h-screen rounded-2xl border-2 border-gray-200"
+              title="PDF Viewer"
+              frameBorder="0"
+            />
+          </div>
+        ) : (
+          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-3xl p-8 mb-8 text-center">
+            <p className="text-yellow-800 font-bold text-lg">📄 Chưa có file PDF để đọc</p>
+          </div>
+        )}
 
         {/* Reactions */}
         <div className="bg-white rounded-3xl shadow-sm p-6 mb-8 flex flex-col items-center">

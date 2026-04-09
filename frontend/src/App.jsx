@@ -181,6 +181,10 @@ function AppContent() {
               userRole={userRole}
               onLogout={handleLogout}
               onOpenLogin={() => setShowLoginModal(true)}
+              onDeleteSuccess={() => {
+                loadStories();
+                navigate('/');
+              }}
             />
           }
         />
@@ -208,7 +212,7 @@ function AppContent() {
 }
 
 // Component để lấy story từ URL param
-function ReaderPageRoute({ isAuthenticated, currentUser, userRole, onLogout, onOpenLogin }) {
+function ReaderPageRoute({ isAuthenticated, currentUser, userRole, onLogout, onOpenLogin, onDeleteSuccess }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [story, setStory] = useState(null);
@@ -249,6 +253,14 @@ function ReaderPageRoute({ isAuthenticated, currentUser, userRole, onLogout, onO
     );
   }
 
+  const handleDelete = () => {
+    if (onDeleteSuccess) {
+      onDeleteSuccess();
+    } else {
+      navigate('/');
+    }
+  };
+
   return (
     <ReaderPage
       story={story}
@@ -258,7 +270,7 @@ function ReaderPageRoute({ isAuthenticated, currentUser, userRole, onLogout, onO
       onBack={() => navigate(-1)}
       onLogout={onLogout}
       onOpenLogin={onOpenLogin}
-      onDelete={() => navigate('/')}
+      onDelete={handleDelete}
     />
   );
 }

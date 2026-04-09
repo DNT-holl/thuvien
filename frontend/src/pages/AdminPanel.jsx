@@ -7,8 +7,6 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
     title: '',
     author: '',
     cover: '',
-    content: '',
-    audioLink: '',
     pdfLink: '',
     category: 'khác',
     description: '',
@@ -71,8 +69,6 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
         title: '',
         author: '',
         cover: '',
-        content: '',
-        audioLink: '',
         pdfLink: '',
         category: 'khác',
         description: '',
@@ -169,36 +165,13 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
             </div>
 
             <div>
-              <label className="block font-bold text-gray-700 mb-2">Nội Dung Truyện</label>
-              <textarea
-                name="content"
-                value={formData.content}
-                onChange={handleChange}
-                rows="6"
-                className="w-full px-4 py-2 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"
-                placeholder="Nhập nội dung truyện..."
-              />
-            </div>
-
-            <div>
-              <label className="block font-bold text-gray-700 mb-2">URL File Audio (MP3)</label>
-              <input
-                type="url"
-                name="audioLink"
-                value={formData.audioLink}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"
-                placeholder="Nhập URL file audio từ Google Drive..."
-              />
-            </div>
-
-            <div>
-              <label className="block font-bold text-gray-700 mb-2">URL File PDF</label>
+              <label className="block font-bold text-gray-700 mb-2">URL File PDF *</label>
               <input
                 type="url"
                 name="pdfLink"
                 value={formData.pdfLink}
                 onChange={handleChange}
+                required
                 className="w-full px-4 py-2 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"
                 placeholder="Nhập URL file PDF từ Google Drive..."
               />
