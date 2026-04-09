@@ -14,7 +14,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Kiểm tra mật khẩu gia đình trong .env
-    if (password !== process.env.ADMIN_PASSWORD) {
+    if (password !== (process.env.ADMIN_PASSWORD || 'giadinh')) {
       return res.status(401).json({ message: 'Mật khẩu sai! Hỏi lại bố/mẹ nhé.' });
     }
 
@@ -33,8 +33,8 @@ router.post('/login', async (req, res) => {
     // Tạo JWT Token
     const token = jwt.sign(
       { id: user._id, username: user.username, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRE }
+      process.env.JWT_SECRET || 'xBc9QmKpL2WnRsT5UvYzFgHjIaKdEfGhJlMnOpQrStUvWxYz',
+      { expiresIn: process.env.JWT_EXPIRE || '7d' }
     );
 
     res.json({
@@ -55,7 +55,7 @@ router.post('/verify', async (req, res) => {
       return res.status(400).json({ valid: false, message: 'Không có token' });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET);
+    jwt.verify(token, process.env.JWT_SECRET || 'xBc9QmKpL2WnRsT5UvYzFgHjIaKdEfGhJlMnOpQrStUvWxYz');
     res.json({ valid: true, message: 'Token hợp lệ' });
   } catch (error) {
     res.status(401).json({ valid: false, message: 'Token không hợp lệ hoặc hết hạn' });
