@@ -30,6 +30,11 @@ const storySchema = new mongoose.Schema({
     enum: ['truyện cổ tích', 'truyện nước ngoài', 'truyện hiện đại', 'khác'],
     default: 'khác',
   },
+  categoryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category',
+    default: null,
+  },
   description: String,
   reactions: {
     like: { type: Number, default: 0 },

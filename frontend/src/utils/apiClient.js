@@ -39,13 +39,27 @@ export const authAPI = {
 
 // Stories API
 export const storiesAPI = {
-  getAll: () => api.get('/stories'),
+  getAll: (categoryId, search) => {
+    const params = new URLSearchParams();
+    if (categoryId) params.append('categoryId', categoryId);
+    if (search) params.append('search', search);
+    return api.get(`/stories?${params.toString()}`);
+  },
   getById: (id) => api.get(`/stories/${id}`),
   create: (data) => api.post('/stories', data),
   update: (id, data) => api.put(`/stories/${id}`, data),
   delete: (id) => api.delete(`/stories/${id}`),
   react: (id, type) => api.put(`/stories/${id}/react`, { type }),
   unreact: (id, type) => api.put(`/stories/${id}/unreact`, { type }),
+};
+
+// Categories API
+export const categoriesAPI = {
+  getAll: () => api.get('/categories'),
+  getById: (id) => api.get(`/categories/${id}`),
+  create: (data) => api.post('/categories', data),
+  update: (id, data) => api.put(`/categories/${id}`, data),
+  delete: (id) => api.delete(`/categories/${id}`),
 };
 
 // Comments API

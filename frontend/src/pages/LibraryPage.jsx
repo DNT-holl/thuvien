@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
-import { BookOpen, User, LogOut, Lock, X } from 'lucide-react';
+import { BookOpen, User, LogOut, X, Plus, Search } from 'lucide-react';
+import { categoriesAPI } from '../utils/apiClient';
 
 export default function LibraryPage({
   stories,
+  categories,
+  selectedCategory,
+  onSelectCategory,
+  searchQuery,
+  onSearchChange,
   currentUser,
   isAuthenticated,
   userRole,
@@ -17,9 +23,13 @@ export default function LibraryPage({
   loginError,
   loginLoading,
   onCloseLogin,
+  onRefreshCategories,
 }) {
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [creatingCategory, setCreatingCategory] = useState(false);
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -28,11 +38,44 @@ export default function LibraryPage({
     setLoginPassword('');
   };
 
+  const handleCreateCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    
+    setCreatingCategory(true);
+    try {
+      await categoriesAPI.create({
+        name: newCategoryName,
+        icon: '📚',
+      });
+      setNewCategoryName('');
+      setShowNewCategory(false);
+      await onRefreshCategories();
+    } catch (err) {
+      console.error('Lỗi tạo danh mục:', err);
+    } finally {
+      setCreatingCategory(false);
+    }
+  };
+
+  const handleDeleteCategory = async (catId) => {
+    if (window.confirm('Bạn chắc muốn xóa danh mục này?')) {
+      try {
+        await categoriesAPI.delete(catId);
+        await onRefreshCategories();
+        if (selectedCategory === catId) {
+          onSelectCategory(null);
+        }
+      } catch (err) {
+        console.error('Lỗi xóa danh mục:', err);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-orange-50 pb-12">
       {/* Header */}
       <header className="bg-white shadow-sm pt-6 pb-4 px-4 sticky top-0 z-20">
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
+        <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-3">
             <BookOpen size={32} className="text-orange-500" />
             <h1 className="text-2xl font-bold text-orange-800">Tủ Sách Gia Đình</h1>
@@ -41,9 +84,9 @@ export default function LibraryPage({
             {isAuthenticated && userRole === 'admin' && (
               <button
                 onClick={onOpenAdmin}
-                className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 transition"
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 transition"
               >
-                <Lock size={18} /> Admin
+                <Plus size={18} /> Thêm truyện
               </button>
             )}
             {isAuthenticated ? (
@@ -68,55 +111,144 @@ export default function LibraryPage({
             )}
           </div>
         </div>
+
+        {/* Search Bar */}
+        <div className="max-w-2xl">
+          <div className="relative">
+            <Search size={20} className="absolute left-3 top-3 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên hoặc tác giả..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border-2 border-gray-300 rounded-full focus:border-orange-500 focus:outline-none"
+            />
+          </div>
+        </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 mt-8">
-        {error && (
-          <div className="bg-red-100 border-2 border-red-500 text-red-700 p-4 rounded-lg mb-6">
-            {error}
-          </div>
-        )}
+      <div className="flex gap-6 px-4 mt-6 max-w-7xl mx-auto">
+        {/* Sidebar - Categories */}
+        <aside className="w-48 flex-shrink-0">
+          <div className="bg-white rounded-2xl shadow-md p-4 sticky top-24">
+            <h2 className="text-lg font-bold text-gray-800 mb-4">📚 Danh Mục</h2>
 
-        {loading ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600 text-lg">Đang tải truyện...</p>
-          </div>
-        ) : stories.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600 text-lg">Chưa có truyện nào cả!</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {stories.map((story) => (
-              <div
-                key={story._id}
-                onClick={() => onSelectStory(story._id)}
-                className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition cursor-pointer border-2 border-transparent hover:border-orange-300 transform hover:-translate-y-1"
-              >
-                <div className="h-48 overflow-hidden relative">
-                  <img src={story.cover} alt={story.title} className="w-full h-full object-cover" />
-                  {story.audioLink && (
-                    <div className="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded-lg text-sm font-bold text-orange-600">
-                      🔊 Có audio
-                    </div>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="text-xl font-bold text-gray-800 mb-1 line-clamp-1">{story.title}</h3>
-                  <p className="text-gray-500 text-sm font-medium mb-3">Tác giả: {story.author}</p>
+            {/* All Button */}
+            <button
+              onClick={() => onSelectCategory(null)}
+              className={`w-full text-left px-4 py-2 rounded-lg mb-2 font-medium transition ${
+                selectedCategory === null
+                  ? 'bg-orange-500 text-white'
+                  : 'text-gray-700 hover:bg-orange-100'
+              }`}
+            >
+              Tất cả
+            </button>
 
-                  <div className="flex items-center gap-4 text-gray-400 text-sm">
-                    <span>❤️ {story.reactions?.heart || 0}</span>
-                    <span>👍 {story.reactions?.like || 0}</span>
-                    <span>😊 {story.reactions?.smile || 0}</span>
-                  </div>
-                </div>
+            {/* Categories List */}
+            {categories.map((cat) => (
+              <div key={cat._id} className="flex items-center gap-2 mb-2">
+                <button
+                  onClick={() => onSelectCategory(cat._id)}
+                  className={`flex-1 text-left px-4 py-2 rounded-lg font-medium transition ${
+                    selectedCategory === cat._id
+                      ? 'bg-orange-500 text-white'
+                      : 'text-gray-700 hover:bg-orange-100'
+                  }`}
+                >
+                  {cat.icon} {cat.name}
+                </button>
+                {isAuthenticated && userRole === 'admin' && (
+                  <button
+                    onClick={() => handleDeleteCategory(cat._id)}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded transition"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
             ))}
+
+            {/* Add Category Button (Admin only) */}
+            {isAuthenticated && userRole === 'admin' && (
+              <>
+                <button
+                  onClick={() => setShowNewCategory(!showNewCategory)}
+                  className="w-full bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-bold flex items-center justify-center gap-2 transition mt-4"
+                >
+                  <Plus size={16} /> Danh mục mới
+                </button>
+
+                {showNewCategory && (
+                  <div className="mt-4 pt-4 border-t">
+                    <input
+                      type="text"
+                      placeholder="Tên danh mục..."
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      className="w-full px-2 py-1 border rounded text-sm mb-2"
+                      disabled={creatingCategory}
+                    />
+                    <button
+                      onClick={handleCreateCategory}
+                      disabled={creatingCategory}
+                      className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-2 py-1 rounded text-sm font-bold transition"
+                    >
+                      {creatingCategory ? 'Đang tạo...' : 'Tạo'}
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
           </div>
-        )}
-      </main>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1">
+          {error && (
+            <div className="bg-red-100 border-2 border-red-500 text-red-700 p-4 rounded-lg mb-6">
+              {error}
+            </div>
+          )}
+
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600 text-lg">Đang tải truyện...</p>
+            </div>
+          ) : stories.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600 text-lg">Chưa có truyện nào cả!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {stories.map((story) => (
+                <div
+                  key={story._id}
+                  onClick={() => onSelectStory(story._id)}
+                  className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition cursor-pointer border-2 border-transparent hover:border-orange-300 transform hover:-translate-y-1"
+                >
+                  <div className="h-48 overflow-hidden relative">
+                    <img src={story.cover} alt={story.title} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-xl font-bold text-gray-800 mb-1 line-clamp-1">{story.title}</h3>
+                    <p className="text-gray-500 text-sm font-medium mb-3">Tác giả: {story.author}</p>
+
+                    <div className="flex items-center gap-4 text-gray-700 font-bold">
+                      <span className="flex items-center gap-1">
+                        ❤️ {story.reactions?.heart || 0}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        💬 {story.comments?.length || 0}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
 
       {/* Login Modal */}
       {showLoginModal && (

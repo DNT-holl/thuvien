@@ -1,6 +1,6 @@
 import './index.css';
 import React, { useState, useEffect } from 'react';
-import { authAPI, storiesAPI, commentsAPI } from './utils/apiClient';
+import { authAPI, storiesAPI, commentsAPI, categoriesAPI } from './utils/apiClient';
 import LoginPage from './pages/LoginPage';
 import LibraryPage from './pages/LibraryPage';
 import ReaderPage from './pages/ReaderPage';
@@ -14,6 +14,9 @@ export default function App() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   
   const [stories, setStories] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedStory, setSelectedStory] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -39,15 +42,26 @@ export default function App() {
         });
     }
     
-    // Luôn load stories (public)
+    // Luôn load stories và categories (public)
+    loadCategories();
     loadStories();
   }, []);
 
+  // Load categories
+  const loadCategories = async () => {
+    try {
+      const response = await categoriesAPI.getAll();
+      setCategories(response.data);
+    } catch (err) {
+      console.error('Lỗi tải danh mục:', err);
+    }
+  };
+
   // Tải danh sách truyện
-  const loadStories = async () => {
+  const loadStories = async (categoryId = null, search = '') => {
     setLoading(true);
     try {
-      const response = await storiesAPI.getAll();
+      const response = await storiesAPI.getAll(categoryId, search);
       setStories(response.data);
       setError('');
     } catch (err) {
@@ -154,6 +168,17 @@ export default function App() {
     return (
       <LibraryPage
         stories={stories}
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onSelectCategory={(catId) => {
+          setSelectedCategory(catId);
+          loadStories(catId, searchQuery);
+        }}
+        searchQuery={searchQuery}
+        onSearchChange={(query) => {
+          setSearchQuery(query);
+          loadStories(selectedCategory, query);
+        }}
         currentUser={currentUser}
         isAuthenticated={isAuthenticated}
         userRole={userRole}
@@ -168,6 +193,7 @@ export default function App() {
         loginError={error}
         loginLoading={loading}
         onCloseLogin={() => setShowLoginModal(false)}
+        onRefreshCategories={loadCategories}
       />
     );
   }

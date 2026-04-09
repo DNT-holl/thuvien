@@ -7,8 +7,23 @@ const router = express.Router();
 // GET /api/stories - Lấy danh sách tất cả truyện (Public)
 router.get('/', async (req, res) => {
   try {
-    const stories = await Story.find({ isPublished: true })
-      .select('id title author cover reactions comments createdAt');
+    const { categoryId, search } = req.query;
+    let query = { isPublished: true };
+
+    if (categoryId) {
+      query.categoryId = categoryId;
+    }
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { author: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    const stories = await Story.find(query)
+      .select('id title author cover reactions comments createdAt categoryId')
+      .sort({ 'reactions.heart': -1 });
     res.json(stories);
   } catch (error) {
     res.status(500).json({ message: error.message });
