@@ -15,7 +15,6 @@ function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState('');
   const [userRole, setUserRole] = useState('viewer');
-  const [showLoginModal, setShowLoginModal] = useState(false);
   
   const [stories, setStories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -99,7 +98,6 @@ function AppContent() {
     setIsAuthenticated(false);
     setCurrentUser('');
     setUserRole('viewer');
-    setShowLoginModal(false);
     navigate('/');
   };
 
@@ -162,12 +160,6 @@ function AppContent() {
               onSelectStory={(storyId) => navigate(`/story/${storyId}`)}
               onLogout={handleLogout}
               onOpenAdmin={() => navigate('/admin')}
-              onOpenLogin={() => setShowLoginModal(true)}
-              showLoginModal={showLoginModal}
-              onLogin={handleLogin}
-              loginError={error}
-              loginLoading={loading}
-              onCloseLogin={() => setShowLoginModal(false)}
             />
           }
         />
@@ -180,7 +172,7 @@ function AppContent() {
               currentUser={currentUser}
               userRole={userRole}
               onLogout={handleLogout}
-              onOpenLogin={() => setShowLoginModal(true)}
+              onOpenLogin={() => navigate('/login')}
               onDeleteSuccess={() => {
                 loadStories();
                 navigate('/');

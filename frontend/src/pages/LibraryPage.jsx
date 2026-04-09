@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { BookOpen, User, LogOut, X, Plus, Search } from 'lucide-react';
+import { BookOpen, User, LogOut, Plus, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function LibraryPage({
   stories,
@@ -13,22 +14,8 @@ export default function LibraryPage({
   onSelectStory,
   onLogout,
   onOpenAdmin,
-  onOpenLogin,
-  showLoginModal,
-  onLogin,
-  loginError,
-  loginLoading,
-  onCloseLogin,
 }) {
-  const [loginUsername, setLoginUsername] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    await onLogin(loginUsername, loginPassword);
-    setLoginUsername('');
-    setLoginPassword('');
-  };
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-orange-50 pb-12">
@@ -62,7 +49,7 @@ export default function LibraryPage({
               </>
             ) : (
               <button
-                onClick={onOpenLogin}
+                onClick={() => navigate('/login')}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full font-bold flex items-center gap-2 transition"
               >
                 <User size={18} /> Đăng nhập
@@ -133,60 +120,6 @@ export default function LibraryPage({
           )}
         </main>
       </div>
-
-      {/* Login Modal */}
-      {showLoginModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-orange-800">Đăng Nhập Admin</h2>
-              <button onClick={onCloseLogin} className="text-gray-500 hover:text-gray-700">
-                <X size={24} />
-              </button>
-            </div>
-
-            {loginError && (
-              <div className="bg-red-100 border-2 border-red-500 text-red-700 p-3 rounded-lg mb-4">
-                {loginError}
-              </div>
-            )}
-
-            <form onSubmit={handleLoginSubmit}>
-              <div className="mb-4">
-                <label className="block text-gray-700 font-bold mb-2">Username</label>
-                <input
-                  type="text"
-                  value={loginUsername}
-                  onChange={(e) => setLoginUsername(e.target.value)}
-                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none"
-                  placeholder="Tên người dùng"
-                  disabled={loginLoading}
-                />
-              </div>
-
-              <div className="mb-6">
-                <label className="block text-gray-700 font-bold mb-2">Password</label>
-                <input
-                  type="password"
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-orange-500 focus:outline-none"
-                  placeholder="Mật khẩu gia đình"
-                  disabled={loginLoading}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loginLoading}
-                className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 text-white font-bold py-2 rounded-lg transition"
-              >
-                {loginLoading ? 'Đang đăng nhập...' : 'Đăng Nhập'}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
