@@ -231,7 +231,6 @@ function ReaderPageRoute({ stories, isAuthenticated, currentUser, userRole, onLo
       onOpenLogin={onOpenLogin}
       onDelete={() => navigate('/')}
     />
-    />
   );
 }
 
