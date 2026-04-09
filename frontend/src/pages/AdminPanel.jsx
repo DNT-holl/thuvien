@@ -8,6 +8,7 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
     author: '',
     cover: '',
     pdfLink: '',
+    videoLink: '',
     category: 'khác',
     description: '',
   });
@@ -70,6 +71,7 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
         author: '',
         cover: '',
         pdfLink: '',
+        videoLink: '',
         category: 'khác',
         description: '',
       });
@@ -181,6 +183,23 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
                 <br />• https://drive.google.com/file/d/FILE_ID/preview
                 <br />• https://drive.google.com/open?id=FILE_ID
                 <br />• FILE_ID (chỉ ID)
+              </p>
+            </div>
+
+            <div>
+              <label className="block font-bold text-gray-700 mb-2">URL Video (YouTube hoặc Google Drive)</label>
+              <input
+                type="text"
+                name="videoLink"
+                value={formData.videoLink}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"
+                placeholder="Link YouTube hoặc Google Drive (tự động chuyển đổi)"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                💡 Hỗ trợ:
+                <br />• YouTube: https://youtu.be/xxx hoặc https://www.youtube.com/watch?v=xxx
+                <br />• Google Drive: https://drive.google.com/file/d/FILE_ID/view
               </p>
             </div>
 

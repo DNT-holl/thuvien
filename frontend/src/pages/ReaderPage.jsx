@@ -221,6 +221,23 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, userRo
           </div>
         )}
 
+        {/* Video Viewer */}
+        {story.videoLink ? (
+          <div className="bg-white rounded-3xl shadow-sm p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">🎬 Xem video</h2>
+            <div className="w-full rounded-2xl border-2 border-gray-200 overflow-hidden" style={{ aspectRatio: '16/9' }}>
+              <iframe
+                src={story.videoLink}
+                className="w-full h-full"
+                title="Video Player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        ) : null}
+
         {/* Reactions */}
         <div className="bg-white rounded-3xl shadow-sm p-6 mb-8 flex flex-col items-center">
           <h3 className="font-bold text-gray-700 mb-4">Yêu thích</h3>

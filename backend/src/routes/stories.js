@@ -1,6 +1,7 @@
 import express from 'express';
 import Story from '../models/Story.js';
 import { authenticateToken, isAdmin } from '../middleware/auth.js';
+import { convertPdfUrl, convertVideoUrl } from '../utils/urlConverter.js';
 
 const router = express.Router();
 
@@ -46,7 +47,7 @@ router.get('/:id', async (req, res) => {
 // POST /api/stories - Tạo truyện mới (Admin only)
 router.post('/', authenticateToken, isAdmin, async (req, res) => {
   try {
-    const { title, author, cover, content, audioLink, pdfLink, category, description } = req.body;
+    const { title, author, cover, content, audioLink, pdfLink, videoLink, category, description } = req.body;
 
     if (!title || !author || !cover) {
       return res.status(400).json({ message: 'Thiếu thông tin bắt buộc!' });
@@ -58,7 +59,8 @@ router.post('/', authenticateToken, isAdmin, async (req, res) => {
       cover,
       content: content || '',
       audioLink: audioLink || '',
-      pdfLink: pdfLink || '',
+      pdfLink: convertPdfUrl(pdfLink) || '',
+      videoLink: convertVideoUrl(videoLink) || '',
       category: category || 'khác',
       description: description || '',
     });
@@ -73,6 +75,14 @@ router.post('/', authenticateToken, isAdmin, async (req, res) => {
 // PUT /api/stories/:id - Cập nhật truyện (Admin only)
 router.put('/:id', authenticateToken, isAdmin, async (req, res) => {
   try {
+    // Convert URLs if they are provided
+    if (req.body.pdfLink) {
+      req.body.pdfLink = convertPdfUrl(req.body.pdfLink);
+    }
+    if (req.body.videoLink) {
+      req.body.videoLink = convertVideoUrl(req.body.videoLink);
+    }
+
     const updatedStory = await Story.findByIdAndUpdate(
       req.params.id,
       req.body,

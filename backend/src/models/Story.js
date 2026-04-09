@@ -25,6 +25,10 @@ const storySchema = new mongoose.Schema({
     type: String, // URL của file PDF từ Google Drive
     default: '',
   },
+  videoLink: {
+    type: String, // URL của video từ Google Drive hoặc YouTube
+    default: '',
+  },
   category: {
     type: String,
     enum: ['truyện cổ tích', 'truyện nước ngoài', 'truyện hiện đại', 'khác'],
