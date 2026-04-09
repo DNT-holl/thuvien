@@ -124,8 +124,6 @@ function AppContent() {
         isAuthenticated,
         currentUser,
         userRole,
-        showLoginModal,
-        setShowLoginModal,
       }}
     >
       <Routes>
