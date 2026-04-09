@@ -1,0 +1,35 @@
+{
+  "name": "thuvien-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Family Library (Thư viện gia đình)",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "build": "echo 'No build needed for Node.js backend'"
+  },
+  "keywords": [
+    "family",
+    "library",
+    "stories",
+    "children"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-validator": "^7.0.0",
+    "google-auth-library": "^8.8.0",
+    "googleapis": "^118.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongodb": "^7.1.1",
+    "mongoose": "^7.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

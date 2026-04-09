@@ -1,0 +1,204 @@
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Heart, ThumbsUp, Smile, MessageCircle, Send, LogOut, PlayCircle } from 'lucide-react';
+import { storiesAPI, commentsAPI } from '../utils/apiClient';
+
+export default function ReaderPage({ story, currentUser, onBack, onLogout }) {
+  const [comments, setComments] = useState([]);
+  const [commentInput, setCommentInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [hasLiked, setHasLiked] = useState(false);
+
+  useEffect(() => {
+    loadComments();
+  }, [story._id]);
+
+  const loadComments = async () => {
+    try {
+      const response = await commentsAPI.getByStoryId(story._id);
+      setComments(response.data);
+    } catch (error) {
+      console.error('Lỗi tải bình luận:', error);
+    }
+  };
+
+  const handleReact = async (type) => {
+    try {
+      // Nếu user chưa tim, thì tim
+      if (!hasLiked) {
+        await storiesAPI.react(story._id, type);
+        story.reactions[type] += 1;
+        setHasLiked(true);
+      } else {
+        // Nếu đã tim rồi, thì hủy tim
+        await storiesAPI.unreact(story._id, type);
+        story.reactions[type] -= 1;
+        setHasLiked(false);
+      }
+      // Trigger re-render
+      window.dispatchEvent(new Event('storyUpdated'));
+    } catch (error) {
+      console.error('Lỗi thêm cảm xúc:', error);
+    }
+  };
+
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (!commentInput.trim()) return;
+
+    setLoading(true);
+    try {
+      await commentsAPI.create({
+        storyId: story._id,
+        text: commentInput,
+      });
+      setCommentInput('');
+      await loadComments();
+    } catch (error) {
+      console.error('Lỗi gửi bình luận:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      await commentsAPI.delete(commentId);
+      await loadComments();
+    } catch (error) {
+      console.error('Lỗi xóa bình luận:', error);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-stone-50 pb-20">
+      {/* Toolbar */}
+      <div className="bg-white border-b sticky top-0 z-10">
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 text-gray-600 hover:text-orange-600 font-bold px-3 py-2 rounded-lg hover:bg-orange-50 transition"
+          >
+            <ArrowLeft size={20} /> Quay lại
+          </button>
+          <h2 className="font-bold text-gray-800 truncate px-4 flex-1 text-center">{story.title}</h2>
+          <button
+            onClick={onLogout}
+            className="text-gray-600 hover:text-red-600 font-bold px-3 py-2 rounded-lg hover:bg-red-50 transition"
+          >
+            <LogOut size={20} />
+          </button>
+        </div>
+      </div>
+
+      <main className="max-w-3xl mx-auto px-4 mt-6">
+        {/* Story Content */}
+        <div className="bg-white rounded-3xl shadow-sm p-6 md:p-10 mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2 text-center">{story.title}</h1>
+          <p className="text-center text-gray-500 font-medium mb-8">Sưu tầm: {story.author}</p>
+
+          <img
+            src={story.cover}
+            alt="Bìa truyện"
+            className="w-full h-64 md:h-96 object-cover rounded-2xl mb-8 border-4 border-stone-100"
+          />
+
+          {/* Audio Player */}
+          {story.audioLink && (
+            <div className="bg-orange-50 rounded-2xl p-4 mb-8 border-2 border-orange-100 flex flex-col items-center">
+              <p className="text-orange-800 font-bold mb-3 flex items-center gap-2">
+                <PlayCircle size={20} /> Nghe truyện đọc
+              </p>
+              <audio controls className="w-full max-w-md">
+                <source src={story.audioLink} type="audio/mpeg" />
+                Trình duyệt không hỗ trợ nghe nhạc.
+              </audio>
+            </div>
+          )}
+
+          {/* Story Content */}
+          <div className="prose prose-lg prose-stone max-w-none text-xl leading-relaxed text-gray-700 whitespace-pre-wrap">
+            {story.content}
+          </div>
+        </div>
+
+        {/* Reactions */}
+        <div className="bg-white rounded-3xl shadow-sm p-6 mb-8 flex flex-col items-center">
+          <h3 className="font-bold text-gray-700 mb-4">Yêu thích</h3>
+          <button
+            onClick={() => handleReact('heart')}
+            className="flex flex-col items-center gap-2 group"
+          >
+            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center group-hover:bg-red-500 group-hover:text-white transition transform group-hover:scale-110">
+              <Heart size={32} fill="currentColor" />
+            </div>
+            <span className="font-bold text-gray-600 text-lg">{story.reactions?.heart || 0}</span>
+          </button>
+        </div>
+
+        {/* Comments */}
+        <div className="bg-white rounded-3xl shadow-sm p-6">
+          <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <MessageCircle className="text-orange-500" />
+            Góc thảo luận ({comments.length})
+          </h3>
+
+          <form onSubmit={handleAddComment} className="flex gap-3 mb-8">
+            <div className="w-10 h-10 bg-orange-200 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-orange-800 uppercase">
+              {currentUser.charAt(0)}
+            </div>
+            <div className="flex-grow flex border-2 border-gray-200 rounded-xl overflow-hidden focus-within:border-orange-400 transition">
+              <input
+                type="text"
+                value={commentInput}
+                onChange={(e) => setCommentInput(e.target.value)}
+                placeholder="Gõ bình luận của cháu vào đây..."
+                className="w-full px-4 py-3 outline-none"
+              />
+              <button
+                type="submit"
+                disabled={!commentInput.trim() || loading}
+                className="bg-orange-50 px-4 text-orange-600 hover:bg-orange-500 hover:text-white transition disabled:opacity-50 disabled:hover:bg-orange-50 disabled:hover:text-orange-600"
+              >
+                <Send size={20} />
+              </button>
+            </div>
+          </form>
+
+          {/* Comments List */}
+          <div className="space-y-5">
+            {comments.length === 0 ? (
+              <p className="text-center text-gray-400 italic py-4">
+                Chưa có ai bình luận, cháu hãy là người đầu tiên nhé!
+              </p>
+            ) : (
+              comments.map((comment) => (
+                <div key={comment._id} className="flex gap-4">
+                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-gray-600 uppercase">
+                    {comment.userName.charAt(0)}
+                  </div>
+                  <div className="bg-gray-50 rounded-2xl rounded-tl-none p-4 flex-grow">
+                    <div className="flex justify-between items-baseline mb-1">
+                      <span className="font-bold text-gray-800">{comment.userName}</span>
+                      <span className="text-xs text-gray-400">
+                        {new Date(comment.createdAt).toLocaleString('vi-VN')}
+                      </span>
+                    </div>
+                    <p className="text-gray-700">{comment.text}</p>
+                    {comment.userName === currentUser && (
+                      <button
+                        onClick={() => handleDeleteComment(comment._id)}
+                        className="text-xs text-red-500 hover:text-red-700 mt-2"
+                      >
+                        Xóa
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

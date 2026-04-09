@@ -1,0 +1,14 @@
+{
+  "deploy": {
+    "backend": {
+      "provider": "render",
+      "url": "https://render.com",
+      "instructions": "1. Tạo tài khoản Render\n2. Tạo New Web Service\n3. Kết nối repo GitHub\n4. Cấu hình build command: npm install\n5. Cấu hình start command: node src/server.js\n6. Thêm environment variables"
+    },
+    "frontend": {
+      "provider": "vercel",
+      "url": "https://vercel.com",
+      "instructions": "1. Tạo tài khoản Vercel\n2. Import repo GitHub\n3. Chọn folder: frontend\n4. Cấu hình build settings tự động\n5. Vercel sẽ tự deploy khi có commit"
+    }
+  }
+}
