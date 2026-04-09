@@ -176,9 +176,10 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
                 placeholder="Paste link PDF từ Google Drive (tự động chuyển đổi)"
               />
               <p className="text-xs text-gray-500 mt-2">
-                💡 Hỗ trợ các định dạng:
+                💡 Hỗ trợ tất cả định dạng link Google Drive:
                 <br />• https://drive.google.com/file/d/FILE_ID/view?usp=sharing
-                <br />• https://drive.google.com/uc?id=FILE_ID
+                <br />• https://drive.google.com/file/d/FILE_ID/preview
+                <br />• https://drive.google.com/open?id=FILE_ID
                 <br />• FILE_ID (chỉ ID)
               </p>
             </div>

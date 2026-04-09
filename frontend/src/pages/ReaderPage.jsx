@@ -14,12 +14,7 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, userRo
   const convertGoogleDriveUrl = (url) => {
     if (!url) return null;
     
-    // Nếu đã là dạng /uc?id=... thì trả về luôn
-    if (url.includes('/uc?id=')) {
-      return url;
-    }
-    
-    // Extract FILE_ID từ các định dạng khác
+    // Extract FILE_ID
     let fileId = null;
     
     // Format: https://drive.google.com/file/d/FILE_ID/view?usp=sharing
@@ -40,7 +35,8 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, userRo
     }
     
     if (fileId) {
-      return `https://drive.google.com/uc?id=${fileId}`;
+      // Dùng /preview để hiển thị PDF trong iframe mà không tải xuống
+      return `https://drive.google.com/file/d/${fileId}/preview`;
     }
     
     return url;
@@ -199,10 +195,12 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, userRo
           <div className="bg-white rounded-3xl shadow-sm p-6 mb-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">📖 Đọc truyện</h2>
             <iframe
-              src={`${convertGoogleDriveUrl(story.pdfLink)}#toolbar=1&navpanes=0`}
-              className="w-full h-screen rounded-2xl border-2 border-gray-200"
+              src={convertGoogleDriveUrl(story.pdfLink)}
+              className="w-full rounded-2xl border-2 border-gray-200"
+              style={{ height: '100vh' }}
               title="PDF Viewer"
               frameBorder="0"
+              allow="autoplay"
             />
           </div>
         ) : (
