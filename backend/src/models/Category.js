@@ -20,12 +20,6 @@ const categorySchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    stories: [
-      {
-        storyId: mongoose.Schema.Types.ObjectId,
-        storyTitle: String,
-      },
-    ],
   },
   { timestamps: true }
 );
