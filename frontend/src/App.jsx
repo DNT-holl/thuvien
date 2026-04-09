@@ -189,7 +189,6 @@ function AppContent() {
           path="/story/:id"
           element={
             <ReaderPageRoute
-              stories={stories}
               isAuthenticated={isAuthenticated}
               currentUser={currentUser}
               userRole={userRole}
@@ -222,12 +221,40 @@ function AppContent() {
 }
 
 // Component để lấy story từ URL param
-function ReaderPageRoute({ stories, isAuthenticated, currentUser, userRole, onLogout, onOpenLogin }) {
+function ReaderPageRoute({ isAuthenticated, currentUser, userRole, onLogout, onOpenLogin }) {
   const { id } = useParams();
   const navigate = useNavigate();
-  const story = stories.find((s) => s._id === id);
+  const [story, setStory] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  if (!story) {
+  useEffect(() => {
+    const loadStory = async () => {
+      try {
+        setLoading(true);
+        const response = await storiesAPI.getById(id);
+        setStory(response.data);
+        setError('');
+      } catch (err) {
+        setError('Không thể tải truyện!');
+        console.error('Lỗi tải truyện:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadStory();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-2xl font-bold text-gray-600">Đang tải...</p>
+      </div>
+    );
+  }
+
+  if (!story || error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-2xl font-bold text-gray-600">Truyện không tìm thấy!</p>
