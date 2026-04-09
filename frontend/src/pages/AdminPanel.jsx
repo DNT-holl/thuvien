@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { ArrowLeft, LogOut, Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, LogOut, Plus, Trash2 } from 'lucide-react';
+import { storiesAPI } from '../utils/apiClient';
 
 export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }) {
   const [formData, setFormData] = useState({
@@ -12,9 +13,43 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
     category: 'khác',
     description: '',
   });
+  const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(null);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+
+  // Load stories khi component mount
+  useEffect(() => {
+    loadStories();
+  }, []);
+
+  const loadStories = async () => {
+    try {
+      const response = await storiesAPI.getAll();
+      setStories(response.data);
+    } catch (err) {
+      console.error('Lỗi tải danh sách truyện:', err);
+    }
+  };
+
+  const handleDeleteStory = async (storyId, storyTitle) => {
+    if (!window.confirm(`Bạn chắc muốn xóa truyện "${storyTitle}"?`)) {
+      return;
+    }
+
+    setDeleting(storyId);
+    try {
+      await storiesAPI.delete(storyId);
+      setStories(stories.filter((s) => s._id !== storyId));
+      setSuccess('Xóa truyện thành công!');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError('Lỗi xóa truyện!');
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,6 +78,7 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
         description: '',
       });
       setSuccess('Thêm truyện thành công!');
+      await loadStories(); // Reload stories list
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError('Lỗi thêm truyện!');
@@ -203,6 +239,47 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
               {loading ? 'Đang thêm...' : 'Thêm Truyện'}
             </button>
           </form>
+        </div>
+
+        {/* Stories List */}
+        <div className="bg-white rounded-3xl shadow-sm p-6 md:p-10 mt-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">📚 Quản Lý Truyện ({stories.length})</h2>
+
+          {stories.length === 0 ? (
+            <p className="text-gray-500 text-center py-8">Chưa có truyện nào. Hãy thêm truyện mới!</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {stories.map((story) => (
+                <div
+                  key={story._id}
+                  className="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-xl hover:border-purple-300 transition"
+                >
+                  <img
+                    src={story.cover}
+                    alt={story.title}
+                    className="w-16 h-24 object-cover rounded-lg flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-gray-800 truncate">{story.title}</h3>
+                    <p className="text-sm text-gray-600 truncate">Tác giả: {story.author}</p>
+                    <div className="text-xs text-gray-500 mt-1">
+                      ❤️ {story.reactions?.heart || 0} | 💬{' '}
+                      {story.comments?.length || 0}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() =>
+                      handleDeleteStory(story._id, story.title)
+                    }
+                    disabled={deleting === story._id}
+                    className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 disabled:opacity-50 rounded-lg transition flex-shrink-0"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </main>
     </div>

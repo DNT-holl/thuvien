@@ -177,6 +177,7 @@ function AppContent() {
               stories={stories}
               isAuthenticated={isAuthenticated}
               currentUser={currentUser}
+              userRole={userRole}
               onLogout={handleLogout}
               onOpenLogin={() => setShowLoginModal(true)}
             />
@@ -206,7 +207,7 @@ function AppContent() {
 }
 
 // Component để lấy story từ URL param
-function ReaderPageRoute({ stories, isAuthenticated, currentUser, onLogout, onOpenLogin }) {
+function ReaderPageRoute({ stories, isAuthenticated, currentUser, userRole, onLogout, onOpenLogin }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const story = stories.find((s) => s._id === id);
@@ -224,9 +225,12 @@ function ReaderPageRoute({ stories, isAuthenticated, currentUser, onLogout, onOp
       story={story}
       currentUser={currentUser}
       isAuthenticated={isAuthenticated}
+      userRole={userRole}
       onBack={() => navigate(-1)}
       onLogout={onLogout}
       onOpenLogin={onOpenLogin}
+      onDelete={() => navigate('/')}
+    />
     />
   );
 }

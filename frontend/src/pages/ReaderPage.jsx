@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Heart, MessageCircle, Send, LogOut, User, PlayCircle } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, Send, LogOut, User, PlayCircle, Trash2 } from 'lucide-react';
 import { storiesAPI, commentsAPI } from '../utils/apiClient';
 
-export default function ReaderPage({ story, currentUser, isAuthenticated, onBack, onLogout, onOpenLogin }) {
+export default function ReaderPage({ story, currentUser, isAuthenticated, userRole, onBack, onLogout, onOpenLogin, onDelete }) {
   const [comments, setComments] = useState([]);
   const [commentInput, setCommentInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -80,6 +80,20 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, onBack
     }
   };
 
+  const handleDeleteStory = async () => {
+    if (!window.confirm(`Bạn chắc muốn xóa truyện "${story.title}"?`)) {
+      return;
+    }
+
+    try {
+      await storiesAPI.delete(story._id);
+      onDelete();
+    } catch (error) {
+      console.error('Lỗi xóa truyện:', error);
+      alert('Lỗi xóa truyện!');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-stone-50 pb-20">
       {/* Toolbar */}
@@ -98,6 +112,15 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, onBack
                 <div className="bg-orange-100 text-orange-800 px-3 py-2 rounded-lg font-bold flex items-center gap-2 text-sm">
                   <User size={16} /> {currentUser}
                 </div>
+                {userRole === 'admin' && (
+                  <button
+                    onClick={handleDeleteStory}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 font-bold px-3 py-2 rounded-lg transition"
+                    title="Xóa truyện này"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                )}
                 <button
                   onClick={onLogout}
                   className="text-gray-600 hover:text-red-600 font-bold px-3 py-2 rounded-lg hover:bg-red-50 transition"
