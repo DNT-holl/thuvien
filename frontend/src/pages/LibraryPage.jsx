@@ -127,16 +127,16 @@ export default function LibraryPage({
         </div>
       </header>
 
-      <div className="flex gap-6 px-4 mt-6 max-w-7xl mx-auto">
+      <div className="flex gap-4 px-4 mt-4 max-w-7xl mx-auto">
         {/* Sidebar - Categories */}
-        <aside className="w-56 flex-shrink-0">
-          <div className="bg-white rounded-xl shadow-sm p-4 sticky top-24 max-h-[calc(100vh-150px)] overflow-y-auto">
-            <h2 className="text-base font-bold text-gray-800 mb-3 px-2">📚 DANH MỤC</h2>
+        <aside className="w-52 flex-shrink-0">
+          <div className="bg-white rounded-xl shadow-sm p-3 sticky top-20 max-h-[calc(100vh-120px)] overflow-y-auto">
+            <h2 className="text-sm font-bold text-gray-800 mb-2 px-2">📚 DANH MỤC</h2>
 
             {/* All Button */}
             <button
               onClick={() => onSelectCategory(null)}
-              className={`w-full text-left px-3 py-2 rounded-lg mb-1 font-medium text-sm transition ${
+              className={`w-full text-left px-3 py-1.5 rounded-lg mb-0.5 font-medium text-xs transition ${
                 selectedCategory === null
                   ? 'bg-orange-500 text-white'
                   : 'text-gray-700 hover:bg-orange-50'
@@ -147,10 +147,10 @@ export default function LibraryPage({
 
             {/* Categories List */}
             {categories.map((cat) => (
-              <div key={cat._id} className="flex items-center gap-1 mb-1 group">
+              <div key={cat._id} className="flex items-center gap-0.5 mb-0.5 group">
                 <button
                   onClick={() => onSelectCategory(cat._id)}
-                  className={`flex-1 text-left px-3 py-2 rounded-lg font-medium text-sm transition ${
+                  className={`flex-1 text-left px-3 py-1.5 rounded-lg font-medium text-xs transition ${
                     selectedCategory === cat._id
                       ? 'bg-orange-500 text-white'
                       : 'text-gray-700 hover:bg-orange-50'
@@ -161,7 +161,7 @@ export default function LibraryPage({
                 {isAuthenticated && userRole === 'admin' && (
                   <button
                     onClick={() => handleDeleteCategory(cat._id)}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded text-xs opacity-0 group-hover:opacity-100 transition"
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 p-0.5 rounded text-xs opacity-0 group-hover:opacity-100 transition"
                   >
                     ✕
                   </button>
@@ -175,22 +175,22 @@ export default function LibraryPage({
                 {!showNewCategory ? (
                   <button
                     onClick={() => setShowNewCategory(true)}
-                    className="w-full bg-purple-500 hover:bg-purple-600 text-white px-3 py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-1 transition mt-3"
+                    className="w-full bg-purple-500 hover:bg-purple-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs flex items-center justify-center gap-1 transition mt-2"
                   >
-                    <Plus size={14} /> Thêm mục
+                    <Plus size={12} /> Mục mới
                   </button>
                 ) : (
-                  <div className="mt-3 pt-3 border-t">
+                  <div className="mt-2 pt-2 border-t">
                     <input
                       type="text"
                       placeholder="Tên danh mục..."
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
-                      className="w-full px-2 py-1 border rounded text-xs mb-2 focus:outline-none focus:border-purple-500"
+                      className="w-full px-2 py-1 border rounded text-xs mb-1 focus:outline-none focus:border-purple-500"
                       disabled={creatingCategory}
                       autoFocus
                     />
-                    <div className="flex gap-2">
+                    <div className="flex gap-1">
                       <button
                         onClick={handleCreateCategory}
                         disabled={creatingCategory || !newCategoryName.trim()}

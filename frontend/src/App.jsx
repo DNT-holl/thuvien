@@ -2,6 +2,7 @@ import './index.css';
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import { authAPI, storiesAPI, commentsAPI, categoriesAPI } from './utils/apiClient';
+import LoginPage from './pages/LoginPage';
 import LibraryPage from './pages/LibraryPage';
 import ReaderPage from './pages/ReaderPage';
 import AdminPanel from './pages/AdminPanel';
@@ -141,6 +142,20 @@ function AppContent() {
       }}
     >
       <Routes>
+        <Route
+          path="/login"
+          element={
+            <LoginPage
+              onLogin={async (username, password) => {
+                await handleLogin(username, password);
+                navigate('/');
+              }}
+              error={error}
+              loading={loading}
+            />
+          }
+        />
+
         <Route
           path="/"
           element={

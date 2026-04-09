@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Heart, MessageCircle, Send, LogOut, User, PlayCircle, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { storiesAPI, commentsAPI } from '../utils/apiClient';
 
 export default function ReaderPage({ story, currentUser, isAuthenticated, userRole, onBack, onLogout, onOpenLogin, onDelete }) {
+  const navigate = useNavigate();
   const [comments, setComments] = useState([]);
   const [commentInput, setCommentInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,7 +25,7 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, userRo
 
   const handleReact = async (type) => {
     if (!isAuthenticated) {
-      onOpenLogin();
+      navigate('/login');
       return;
     }
 
@@ -50,7 +52,7 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, userRo
     e.preventDefault();
     
     if (!isAuthenticated) {
-      onOpenLogin();
+      navigate('/login');
       return;
     }
 
