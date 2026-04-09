@@ -488,30 +488,6 @@ export default function LibraryPage({
     </div>
   );
 }
-
-export default function LibraryPage({
-  stories,
-  categories,
-  selectedCategory,
-  onSelectCategory,
-  searchQuery,
-  onSearchChange,
-  currentUser,
-  isAuthenticated,
-  userRole,
-  loading,
-  error,
-  onSelectStory,
-  onLogout,
-  onOpenAdmin,
-  onOpenLogin,
-  showLoginModal,
-  onLogin,
-  loginError,
-  loginLoading,
-  onCloseLogin,
-  onRefreshCategories,
-}) {
   const [loginUsername, setLoginUsername] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [newCategoryName, setNewCategoryName] = useState('');
