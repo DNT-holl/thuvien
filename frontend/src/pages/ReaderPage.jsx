@@ -194,12 +194,6 @@ export default function ReaderPage({ story, currentUser, isAuthenticated, userRo
         <div className="bg-white rounded-3xl shadow-sm p-6 md:p-10 mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2 text-center">{story.title}</h1>
           <p className="text-center text-gray-500 font-medium mb-8">Tác giả: {story.author}</p>
-
-          <img
-            src={story.cover}
-            alt="Bìa truyện"
-            className="w-full h-64 md:h-96 object-cover rounded-2xl border-4 border-stone-100"
-          />
         </div>
 
         {/* PDF Viewer */}
