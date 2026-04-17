@@ -64,7 +64,7 @@ export default function LibraryPage({
             <Search size={20} className="absolute left-3 top-3 text-gray-400" />
             <input
               type="text"
-              placeholder="Tìm kiếm theo tên hoặc tác giả..."
+              placeholder="Tìm kiếm theo tên truyện, tác giả hoặc thể loại..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border-2 border-gray-300 rounded-full focus:border-orange-500 focus:outline-none"

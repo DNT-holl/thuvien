@@ -19,6 +19,7 @@ router.get('/', async (req, res) => {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
         { author: { $regex: search, $options: 'i' } },
+        { category: { $regex: search, $options: 'i' } },
       ];
     }
 
