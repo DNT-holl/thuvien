@@ -167,13 +167,12 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
             </div>
 
             <div>
-              <label className="block font-bold text-gray-700 mb-2">URL File PDF *</label>
+              <label className="block font-bold text-gray-700 mb-2">URL File PDF</label>
               <input
                 type="text"
                 name="pdfLink"
                 value={formData.pdfLink}
                 onChange={handleChange}
-                required
                 className="w-full px-4 py-2 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"
                 placeholder="Paste link PDF từ Google Drive (tự động chuyển đổi)"
               />
@@ -187,7 +186,7 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
             </div>
 
             <div>
-              <label className="block font-bold text-gray-700 mb-2">URL Video (YouTube hoặc Google Drive)</label>
+              <label className="block font-bold text-gray-700 mb-2">URL Video (YouTube hoặc Google Drive) *</label>
               <input
                 type="text"
                 name="videoLink"
@@ -197,7 +196,7 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
                 placeholder="Link YouTube hoặc Google Drive (tự động chuyển đổi)"
               />
               <p className="text-xs text-gray-500 mt-2">
-                💡 Hỗ trợ:
+                💡 Phải có ít nhất PDF hoặc Video (hoặc cả 2). Hỗ trợ:
                 <br />• YouTube: https://youtu.be/xxx hoặc https://www.youtube.com/watch?v=xxx
                 <br />• Google Drive: https://drive.google.com/file/d/FILE_ID/view
               </p>

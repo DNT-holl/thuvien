@@ -53,6 +53,10 @@ router.post('/', authenticateToken, isAdmin, async (req, res) => {
       return res.status(400).json({ message: 'Thiếu thông tin bắt buộc!' });
     }
 
+    if (!pdfLink && !videoLink) {
+      return res.status(400).json({ message: 'Phải có ít nhất PDF hoặc Video (hoặc cả 2)!' });
+    }
+
     const newStory = new Story({
       title,
       author,
