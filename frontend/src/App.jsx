@@ -114,7 +114,7 @@ function AppContent() {
 
   const handleSearchChange = (query) => {
     setSearchQuery(query);
-    loadStories(null, query);
+    loadStories(query);
   };
 
   return (

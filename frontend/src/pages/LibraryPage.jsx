@@ -96,23 +96,20 @@ export default function LibraryPage({
                 <div
                   key={story._id}
                   onClick={() => onSelectStory(story._id)}
-                  className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition cursor-pointer border-2 border-transparent hover:border-orange-300 transform hover:-translate-y-1"
+                  className="bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition cursor-pointer border-2 border-transparent hover:border-white transform hover:-translate-y-1 p-6 min-h-64 flex flex-col justify-between"
                 >
-                  <div className="h-48 overflow-hidden relative">
-                    <img src={story.cover} alt={story.title} className="w-full h-full object-cover" />
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-2 line-clamp-3">{story.title}</h3>
+                    <p className="text-orange-100 text-sm font-medium">Tác giả: {story.author}</p>
                   </div>
-                  <div className="p-4">
-                    <h3 className="text-xl font-bold text-gray-800 mb-1 line-clamp-1">{story.title}</h3>
-                    <p className="text-gray-500 text-sm font-medium mb-3">Tác giả: {story.author}</p>
 
-                    <div className="flex items-center gap-4 text-gray-700 font-bold">
-                      <span className="flex items-center gap-1">
-                        ❤️ {story.reactions?.heart || 0}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        💬 {story.comments?.length || 0}
-                      </span>
-                    </div>
+                  <div className="flex items-center gap-4 text-white font-bold mt-4 pt-4 border-t border-orange-300">
+                    <span className="flex items-center gap-1">
+                      ❤️ {story.reactions?.heart || 0}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      💬 {story.comments?.length || 0}
+                    </span>
                   </div>
                 </div>
               ))}

@@ -11,7 +11,7 @@ const storySchema = new mongoose.Schema({
   },
   cover: {
     type: String, // URL từ Google Drive hoặc Unsplash
-    required: true,
+    default: '',
   },
   content: {
     type: String,

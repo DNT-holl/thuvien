@@ -6,7 +6,6 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
   const [formData, setFormData] = useState({
     title: '',
     author: '',
-    cover: '',
     pdfLink: '',
     videoLink: '',
     category: 'khác',
@@ -69,7 +68,6 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
       setFormData({
         title: '',
         author: '',
-        cover: '',
         pdfLink: '',
         videoLink: '',
         category: 'khác',
@@ -150,19 +148,6 @@ export default function AdminPanel({ onBack, onAddStory, currentUser, onLogout }
                 required
                 className="w-full px-4 py-2 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"
                 placeholder="Nhập tên tác giả..."
-              />
-            </div>
-
-            <div>
-              <label className="block font-bold text-gray-700 mb-2">URL Ảnh Bìa *</label>
-              <input
-                type="url"
-                name="cover"
-                value={formData.cover}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border-2 border-purple-200 rounded-xl focus:border-purple-500 focus:outline-none"
-                placeholder="Nhập URL ảnh từ Google Drive hoặc Unsplash..."
               />
             </div>
 

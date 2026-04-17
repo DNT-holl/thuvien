@@ -50,7 +50,7 @@ router.post('/', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { title, author, cover, content, audioLink, pdfLink, videoLink, category, description } = req.body;
 
-    if (!title || !author || !cover) {
+    if (!title || !author) {
       return res.status(400).json({ message: 'Thiếu thông tin bắt buộc!' });
     }
 
